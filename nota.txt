@@ -1,0 +1,8 @@
+#Nota de aprendizado
+
+
+- Aqui irei aplicar minhas notas de aprendizados e também irá servir como um lembretes.
+
+Inicialmente, utilizei o comando " gcc main.c calculadora.c -o calculadora " para compactar este 2 arquivo em 1, e tranformar ela em binários
+logo isso, este 2 arquivo irão ser executado como 1.
+
