@@ -10,26 +10,22 @@ int primo(int a){
     if(a==2) return 1;
     if(a%2 == 0) return 0;
      /* número não é primo enquanto dividir por ele menos dá 0 */
-    if(a%a==0) return 0;
-    for(int i=3; a<=i;i+=2){
+    for(int i=3; i * i <= a; i+=2){
         if (a%i == 0){
             return 0;
+            };
         };
-    };
     return 1;
 }
 
-/* REFAZER ESTE CÓDIGO */
 int fatorial(int a) {
-    int fat;
+    int fat=a;
     if(a<0){
         return 0;
     }else{
     for(int i = 1,n; n > 1; i++){
         n = a-i;
-        fat = a * n;
-        
-        
+        fat = fat * n;   
     };
     };
     return fat;
@@ -45,10 +41,9 @@ int maior(int a,int b){
 };
 
 int potencia(int a, int b){
-    int result, cont;
-    result = a;
-    for(cont = 1; b<= cont; cont++){
-        result = result * b;
-    };
-    return result;
+    int r = a;
+    for(int cont = 1; cont < b ; cont++){
+        r = r * a;
+    }; 
+    return r;
 };
