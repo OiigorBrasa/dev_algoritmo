@@ -6,8 +6,10 @@ int menu_login(char cpf[12], char senha[7], char nomec[60]);
 int d = 0;
 void plataform_acess(char cpf[12], char senha[7], char nomec[60]); // definindo a funcao;
 void op1(char cpf[12], char senha[7], char nomec[60]);
-void op2(), op3(), op4(), op5(), op6();
+void op2(char cpf[12], char senha[7], char nomec[60]);
+void op3(), op4(), op5(), op6();
 void dados_banco(char cpf[12], int select);
+void acao_banco(int select);
 
 int main() {
     FILE *f = fopen("dados/usuario.txt", "r");
@@ -77,9 +79,11 @@ void plataform_acess(char cpf[12], char senha[7], char nomec[60]) {
             break;
         case 2:
             printf("Opcao 2 selecionada\n");
+            op2(cpf, senha, nomec);
             break;
         case 3:
             printf("Opcao 3 selecionada\n");
+            acao_banco(1);
             break;
         case 4:
             printf("Opcao 4 selecionada\n");
@@ -119,6 +123,25 @@ void op1(char cpf[12], char senha[7], char nomec[60]) {
     }
 }
 
+void op2(char cpf[12], char senha[7], char nomec[60]) {
+    // depois, realizar manutencao para que o programa leia os arquivos e armazenar na variavel, por enquanto as variaveis serao definidas por aqui
+    int select = 0;
+    char dsenha[7];
+
+    printf("Senha (numeros): ");
+    scanf("%6s", dsenha);
+    printf("\n");
+
+    if (strcmp(senha, dsenha) == 0) {
+        // exibicao de dados, aplicar verificacao por senhas antes de realmente fazer os dados aparecer;
+        printf("Nome: %s\n", nomec);
+        printf("Cpf: %s\n\n", cpf);
+        dados_banco(cpf, select = 2);
+    } else {
+        printf("Senha incorreta!");
+    }
+}
+
 void dados_banco(char cpf[12], int select) {
     if (select == 1) {
         char moeda[12];
@@ -138,4 +161,57 @@ void dados_banco(char cpf[12], int select) {
         }
         fclose(f);
     }
+    
+    else if(select == 2){
+        FILE *f = fopen("dados/extratos.txt", "r");
+		if (f == NULL) {
+            printf("Erro ao abrir arquivo banco");
+            return;
+        }
+        char c[255]; // armazena oque foi lido
+        // enquanto nao chegar ao final do arquivo
+        while (fscanf(f, "%s\n", c) == 1) { // enquanto a linha atual do arquivo existir, vai continuar lendo ate chegar no 0   
+        	printf("%s\n", c);
+		}
+        fclose(f);
+	}
+}
+
+void acao_banco(int select){
+	// select 1 deposito; select 2 saque
+
+	float deposito = 0.00;
+	float reais = 0.00;
+	float bitcoin = 0.0000;
+	float eth = 0.00;
+	float ripp = 0.00;
+
+	
+	if(select == 1){
+		float total = 00.00;
+		FILE *f; 
+		f = fopen("dados/banco.txt", "r");
+	    if (f == NULL) {
+	        printf("Erro ao abrir arquivo banco");   
+	    }
+	    if(fscanf(f,"Reais %f\nBitcoin %f\nEthereum %f\nRipple %f",&reais,&bitcoin,&eth,&ripp) == 4){
+	    	printf("Valor de deposito: ");
+	    	scanf("%20f", &deposito);
+	    	total = deposito + reais;
+			printf("valor a depositar %.2f e o saldo ficara %.2f\n",deposito,total);
+			} 
+		fclose(f);
+			
+		f = fopen("dados/banco.txt", "w"); // abrir o arquivo para sobreescrever o novo saldo
+		if (f== NULL){
+			printf("erro ao abrir arquivo banco.txt");
+		}
+		if(fprintf(f,"Reais %.2f\nBitcoin %.4f\nEthereum %.2f\nRipple %.2f",total,bitcoin,eth,ripp) == 1){
+			printf("Saldo aplicado com sucesso!");
+			
+		}else{
+			printf("Erro ao inserir saldo em arquivo");
+		};  
+		fclose(f);
+	}
 }

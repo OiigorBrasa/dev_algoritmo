@@ -1,4 +1,4 @@
-Reais 0.00
-Bitcoin 0.0000
-Ethereum 0.00
-Ripple 0.00
+Reais 9.80
+Bitcoin 4.0000
+Ethereum 1.00
+Ripple 0.20
