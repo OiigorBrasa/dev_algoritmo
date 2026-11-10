@@ -6,14 +6,15 @@
 int menu_login(char cpf[12], char senha[7], char nomec[60]);
 int d = 0;
 void plataform_acess(char cpf[12], char senha[7], char nomec[60]); // definindo a funcao;
-void op(char cpf[12], char senha[7], char nomec[60],int select);
-void op3(), op4(), op5(), op6();
+void op(char cpf[12], char senha[7], char nomec[60],int select, int qual);
 void dados_banco(char cpf[12], int select);
 void acao_banco(int select);
+void acao_cripto(int select);
 int atualizar_extrato(char acao[2],float deposito,char em[10],float ct,float tx,float real,float btc,float eth,float xrp);
 
 int main() {
-	
+	acao_cripto(1);
+	/*
     FILE *f = fopen("dados/usuario.txt", "r");
     if (f == NULL) {
         printf("erro ao abrir o arquivo");
@@ -35,7 +36,7 @@ int main() {
         fclose(f);
         return 1;
     }
-    fclose(f);
+    fclose(f); */
 	return 0;
 }
 
@@ -73,32 +74,32 @@ void plataform_acess(char cpf[12], char senha[7], char nomec[60]) {
     switch (option) { // utilizar o switch pois as opcao sao de casos
     case 1:
         printf("Opcao 1 selecionada\n");
-  	    op(cpf, senha, nomec, 1);
+  	    op(cpf, senha, nomec, 1,1);
     	break;
     case 2:
         printf("Opcao 2 selecionada\n");
-        op(cpf, senha, nomec, 2);
+        op(cpf, senha, nomec, 2,1);
         break;
     case 3:
         printf("Opcao 3 selecionada\n");
-        acao_banco(1);
         break;
     case 4:
         printf("Opcao 4 selecionada\n");
-        acao_banco(2);
         break;
     case 5:
         printf("Opcao 5 selecionada\n");
-        break;
+        op(cpf,senha,nomec,1,2);
+		break;
     case 6:
         printf("Opcao 6 selecionada\n");
-        break;
+        op(cpf,senha,nomec,2,2);
+		break;
     case 7:
         printf("Opcao 7 selecionada\n");
        	break;
     case 8:
         printf("Saindo...");
-        status = 0;
+        status = 0; // status 0 ativa a saida no while
         break;
     default: 
     	printf("Selecione de 1 a 8!\n");
@@ -106,7 +107,7 @@ void plataform_acess(char cpf[12], char senha[7], char nomec[60]) {
 	}while(status != 0);
 }
 
-void op(char cpf[12], char senha[7], char nomec[60],int select) {
+void op(char cpf[12], char senha[7], char nomec[60],int select, int qual) {
     // depois, realizar manutencao para que o programa leia os arquivos e armazenar na variavel, por enquanto as variaveis serao definidas por aqui
     char dsenha[7];
 
@@ -116,9 +117,13 @@ void op(char cpf[12], char senha[7], char nomec[60],int select) {
 
     if (strcmp(senha, dsenha) == 0) {
         // exibicao de dados, aplicar verificacao por senhas antes de realmente fazer os dados aparecer;
-        printf("Nome: %s\n", nomec);
-        printf("Cpf: %s\n\n", cpf);
-        dados_banco(cpf, select);
+        if(qual == 1){
+	        printf("Cpf: %s\n\n", cpf);
+    	    printf("Nome: %s\n", nomec);        	
+			dados_banco(cpf, select);
+		}else{
+			acao_cripto(select);
+		}
     } else {
         printf("Senha incorreta!");
     }
@@ -151,7 +156,7 @@ void dados_banco(char cpf[12], int select) {
         }
         char c[255]; // armazena oque foi lido
         // enquanto nao chegar ao final do arquivo
-        while (fgets(c,sizeof(c), f) != NULL) { // enquanto a linha atual do arquivo existir, vai continuar lendo ate chegar no 0   
+        while (fgets(c,sizeof(c), f) != NULL) { // enquanto a linha atual do arquivo existir, vai continuar lendo ate chegar no 0 (final)
         	printf("%s", c);
 		}
         fclose(f);
@@ -159,17 +164,14 @@ void dados_banco(char cpf[12], int select) {
 }
 
 void acao_banco(int select) {
-    // 1: deposito, 2: saque
     if (select != 1 && select != 2) return;
 
     float reais = 0, btc = 0, eth = 0, xrp = 0, valor = 0, total = 0;
     FILE *f = fopen("dados/banco.txt", "r");
-
     if (f == NULL) {
         printf("Erro ao abrir arquivo banco para leitura.\n");
         return;
     }
-
     if (fscanf(f, "Reais %f\nBitcoin %f\nEthereum %f\nRipple %f", &reais, &btc, &eth, &xrp) != 4) {
         printf("Erro ao ler formato do arquivo.\n");
         fclose(f);
@@ -177,7 +179,7 @@ void acao_banco(int select) {
     }
     fclose(f);
 
-    if (select == 1) { // DEPÓSITO
+    if (select == 1) { 
         printf("Valor de deposito: ");
         scanf("%20f", &valor);
         total = reais + valor;
@@ -219,7 +221,7 @@ int atualizar_extrato(char acao[2],float deposito,char em[10],float ct,float tx,
 	time_t tempo_atual = time(NULL); // pesquisado no google como capturar o tempo e horario atual
 	struct tm *info_tempo = localtime(&tempo_atual);
 	
-	fprintf(ext,"%02d-%02d-%d %02d:%02d %s %.2f %s CT: %f\tTX: %.2f REAL: %.2f BTC: %.4f ETH: %.2f XRP: %.2f\n",
+	fprintf(ext,"%02d-%02d-%d %02d:%02d\t%s\t%.2f\t%s\tCT: %f\tTX: %.2f\tREAL: %.2f\tBTC: %.4f\tETH: %.2f\tXRP: %.2f\n",
 		info_tempo->tm_mday, 
     	info_tempo->tm_mon + 1,      // Meses vão de 0 a 11
     	info_tempo->tm_year + 1900, // Anos contados a partir de 1900
@@ -240,3 +242,55 @@ int atualizar_extrato(char acao[2],float deposito,char em[10],float ct,float tx,
 	return 0;
 	
 }
+
+void acao_cripto(int select){
+	char moeda[12];
+	float ceth,cxrp,cbtc = 0.0;
+	FILE *f = fopen("dados/cotacao.txt","r");
+	if(f == NULL){
+		printf("Erro ao abrir arquivo banco");
+        return;
+	}
+	if(fscanf(f,"Bitcoin %f\nEthereum %f\nRipple %f",&cbtc,&ceth,&cxrp) == 3){
+		printf("Cotacao por unidade de criptos em R$:\nBitcoins - R$ %.3f\nEthereum - R$ %.3f\nRipple - R$ %.2f\n\n",cbtc,ceth,cxrp);
+	}else{
+		printf("erro ao ler as cotas");
+		return;
+	};
+	fclose(f);
+	
+	if(select == 1){
+		printf("Comprar criptomoeda\ninsira cripto que deseja comprar:\n");
+		int buyop = 0;
+		int valor = 0;
+		do{
+			printf("1 - Bitcoin\n2 - Ethereum\n3 - Ripple\n0 - Sair\n: ");
+			scanf("%d", &buyop);
+			switch (buyop){
+			case 1:
+				printf("Selecionado %d btc\n",buyop);
+//				scanf("Quanto você deseja comprar (em R$)?\n",&valor);
+				break;
+			case 2:
+				printf("Selecionado %d:\n",buyop);
+				break;
+			case 3:
+				printf("Selecionado %d:\n",buyop);
+				break;
+			case 0:
+				printf("Saindo...");
+				return;
+				break;
+			}
+		}while(buyop != 0);
+	}
+}
+
+/*void comprar_vender(char f[255], int qual){
+	
+	if (qual = 1){
+		
+	}
+}*/
+
+
