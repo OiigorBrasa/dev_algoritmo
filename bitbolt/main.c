@@ -191,7 +191,7 @@ void acao_banco(int select) {
         antvalor = valor; // armazena o antigo valor
         valor = reais + valor;
         printf("Valor a depositar %.2f e o saldo ficara %.2f\n", antvalor, valor);
-    } else { // SAQUE
+    } else { // Saque
         printf("Valor disponivel para sacar: %.2f\n", reais);
         printf("Insira o valor de saque: ");
         scanf("%20lf", &valor); 
@@ -404,6 +404,7 @@ int atualizar_extrato(char acao[2],double deposito,char moeda[10],double ct,doub
         printf("%s realizado com sucesso!\n", select == 1 ? "Deposito": "Saque");
         if(select == 2){
             printf("Novo saldo: %.2f\n",real);
+            printf("Reais: %.2f\nBitcoin: %.8f\nEthereum: %.4f\nRipple: %.4f\n", real, btc, eth, xrp);
         }
     }
     
