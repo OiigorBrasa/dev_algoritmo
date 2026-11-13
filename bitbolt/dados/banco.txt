@@ -1,4 +1,4 @@
-Reais 12352.60
-Bitcoin 0.10000000
-Ethereum 0.51
+Reais 14303.00
+Bitcoin 0.10047584
+Ethereum 0.31
 Ripple 5.21

@@ -146,7 +146,7 @@ void dados_banco(char cpf[12], int select) {
         // enquanto nao chegar ao final do arquivo
         while (fscanf(f, "%s %lf\n", moeda, &quantia) == 2) {
             if (strcmp(moeda, "Bitcoin") == 0) {
-                printf("%s: %.4f\n", moeda, quantia);
+                printf("%s: %.8f\n", moeda, quantia);
             } else {
                 printf("%s: %.2f\n", moeda, quantia);
             }
@@ -253,7 +253,7 @@ void acao_cripto(int select){
 			}
             printf("Valor de compra: ");
             scanf("%20lf", &valor); 
-            antvalor = valor;
+            antvalor = valor; // valor oficial gasto pelo usuario, e aplicar reduçõa deste saldo
             
             if( reais-valor < 0 ){
                 printf("Valor ultrapassado, insiria valor valido!");
@@ -267,7 +267,7 @@ void acao_cripto(int select){
                 taxa = 2.0;
                 valor = valor - taxa_porcentual(valor,taxa,1);
                 cripto_convert = valor / cbtc; // converte o valor real inserido em BTC de acordo com a cotação atual
-                reais = reais - valor; // atualiza o valor real no depósito;
+                reais = reais - antvalor; // atualiza o valor real no depósito;
                 btc = btc + cripto_convert; // atualiza a cripto na carteira;
 				printf("Aplicando a taxa de 2 %% que resulta em: %.2f\n%.8f de %s aplicado na carteira\n",valor,cripto_convert,moeda);
                 atualizar_extrato("+",antvalor,moeda,cripto_convert,taxa,reais,btc,eth,xrp,select);
@@ -278,7 +278,7 @@ void acao_cripto(int select){
 				taxa = 1.0;
                 valor = valor - taxa_porcentual(valor,taxa,1);
                 cripto_convert = valor / ceth; // converte o valor real inserido em BTC de acordo com a cotação atual
-                reais = reais - valor; // atualiza o valor real no depósito;
+                reais = reais - antvalor; // atualiza o valor real no depósito;
                 eth = eth + cripto_convert; // atualiza a cripto na carteira;
 				printf("Aplicando a taxa de 2 %% que resulta em: %.2f\n%.8f de %s aplicado na carteira\n",valor,cripto_convert,moeda);
                 atualizar_extrato("+",antvalor,moeda,cripto_convert,taxa,reais,btc,eth,xrp,select);
@@ -290,7 +290,7 @@ void acao_cripto(int select){
                 taxa = 1.0;
                 valor = valor - taxa_porcentual(valor,taxa,1);
                 cripto_convert = valor / cxrp; // converte o valor real inserido em BTC de acordo com a cotação atual
-                reais = reais - valor; // atualiza o valor real no depósito;
+                reais = reais - antvalor; // atualiza o valor real no depósito;
                 xrp = xrp + cripto_convert; // atualiza a cripto na carteira;
 				printf("Aplicando a taxa de 2 %% que resulta em: %.2f\n%.8f de %s aplicado na carteira\n",valor,cripto_convert,moeda);
                 atualizar_extrato("+",antvalor,moeda,cripto_convert,taxa,reais,btc,eth,xrp,select);
@@ -401,9 +401,9 @@ int atualizar_extrato(char acao[2],double deposito,char moeda[10],double ct,doub
     if (fprintf(f, "Reais %.2f\nBitcoin %.8f\nEthereum %.2f\nRipple %.2f", real, btc, eth, xrp) < 0) {
         printf("Erro ao inserir saldo em arquivo.\n");
     } else {
-        printf("%s realizado com sucesso!\n", select == 1 ? "Deposito": "Saque");
+        printf("Acao realizado com sucesso!");
         if(select == 2){
-            printf("Novo saldo: %.2f\n",real);
+            printf("Novos saldos:\n");
             printf("Reais: %.2f\nBitcoin: %.8f\nEthereum: %.4f\nRipple: %.4f\n", real, btc, eth, xrp);
         }
     }
@@ -439,7 +439,6 @@ int atualizar_extrato(char acao[2],double deposito,char moeda[10],double ct,doub
 void atualizar_cotacao() {
     double cbtc = 0.0, ceth = 0.0, cxrp = 0.0;
 
-    // 1. Abre o arquivo para ler as cotações atuais
     FILE *f = fopen("dados/cotacao.txt", "r");
     if (f == NULL) {
         printf("Erro ao abrir arquivo de cotacao para leitura.\n");
@@ -453,26 +452,24 @@ void atualizar_cotacao() {
     }
     fclose(f);
 
-    // 2. Calcula a variacao aleatoria entre -5% e +5%
-    // (rand() % 1001 - 500) gera números entre -500 e 500. 
+    // note: (rand() % 1001 - 500) gera números entre -500 e 500. 
     // Dividindo por 10000.0, obtemos um multiplicador entre -0.05 e 0.05
-    double var_btc = (rand() % 1001 - 500) / 10000.0;
+    double var_btc = (rand() % 1001 - 500) / 10000.0; // aqui estamo calculando uma variação atualeatória entre -5% a +5%
     double var_eth = (rand() % 1001 - 500) / 10000.0;
     double var_xrp = (rand() % 1001 - 500) / 10000.0;
 
-    // 3. Aplica a variacao aos valores
+    //Aplicando a variacao nos valores
     cbtc = cbtc + (cbtc * var_btc);
     ceth = ceth + (ceth * var_eth);
     cxrp = cxrp + (cxrp * var_xrp);
 
-    // 4. Salva as novas cotações sobrescrevendo o arquivo
     f = fopen("dados/cotacao.txt", "w");
     if (f == NULL) {
         printf("Erro ao abrir arquivo de cotacao para escrita.\n");
         return;
     }
 
-    fprintf(f, "Bitcoin %lf\nEthereum %lf\nRipple %lf", cbtc, ceth, cxrp);
+    fprintf(f, "Bitcoin %lf\nEthereum %lf\nRipple %lf", cbtc, ceth, cxrp); // reescreve o arquivo atualizando a cotação
     fclose(f);
 
     printf("\n--- Cotacoes atualizadas com sucesso! ---\n");
